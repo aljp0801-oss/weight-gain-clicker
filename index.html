@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f59e0b" />
+    <meta
+      name="description"
+      content="Weight gain clicker game built for phones in HTML5."
+    />
+    <title>Bulk Builder</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23f59e0b' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' width='100' height='100'/><text x='50%' y='50%' font-size='60' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Gain mode</p>
+          <h1>Bulk Builder</h1>
+        </div>
+        <button id="resetBtn" class="secondary-button" type="button">Reset</button>
+      </header>
+
+      <main class="game-layout">
+        <section class="hero-card panel">
+          <div class="weight-block">
+            <p class="label">Current weight</p>
+            <h2 id="weightValue">180.0 lb</h2>
+            <p id="goalText" class="muted">Goal: 250 lb</p>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar" aria-label="Weight progress">
+              <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="progress-labels">
+              <span>0 lb</span>
+              <span id="goalLabel">250 lb</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-box panel">
+            <p class="label">Calories</p>
+            <strong id="caloriesValue">0</strong>
+          </article>
+
+          <article class="stat-box panel">
+            <p class="label">Per tap</p>
+            <strong id="tapValue">10</strong>
+          </article>
+
+          <article class="stat-box panel">
+            <p class="label">Auto gain</p>
+            <strong id="autoValue">0/s</strong>
+          </article>
+        </section>
+
+        <button id="eatButton" class="eat-button" type="button" aria-label="Eat to gain weight">
+          <span class="button-icon">🍔</span>
+          <span class="button-copy">Eat for gains</span>
+          <small>+<span id="tapGain">10</span> calories</small>
+        </button>
+
+        <section class="shop panel">
+          <div class="shop-header">
+            <h3>Upgrades</h3>
+            <span id="statusText" class="status-pill">Ready</span>
+          </div>
+          <div id="shopList" class="shop-list" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
