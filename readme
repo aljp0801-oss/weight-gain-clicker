@@ -1,0 +1,11 @@
+# Bulk Builder
+
+A mobile-friendly incremental weight-gain clicker with skin progression, rebirths, and prestige upgrades.
+
+## Play locally
+
+Open the project in a browser through a local static server:
+
+```bash
+cd /path/to/weight-gain-clicker
+python3 -m http.server 8000
