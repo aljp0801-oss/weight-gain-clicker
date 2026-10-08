@@ -1,106 +1,568 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f59e0b" />
-    <meta name="description" content="Weight gain clicker game built for phones in HTML5." />
-    <title>Bulk Builder</title>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23f59e0b' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' width='100' height='100'/><text x='50%' y='50%' font-size='60' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Gain mode</p>
-          <h1>Bulk Builder</h1>
-        </div>
-        <button id="resetBtn" class="secondary-button" type="button">Reset</button>
-      </header>
+:root {
+  --bg: #0b1020;
+  --bg-2: #111827;
+  --panel: rgba(15, 23, 42, 0.9);
+  --panel-alt: rgba(30, 41, 59, 0.9);
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --gold: #f59e0b;
+  --gold-soft: #fbbf24;
+  --green: #34d399;
+  --green-soft: #a7f3d0;
+  --blue: #3b82f6;
+  --blue-soft: #60a5fa;
+  --purple: #a855f7;
+  --danger: #fb7185;
+  --shadow: rgba(15, 23, 42, 0.45);
+}
 
-      <main class="game-layout">
-        <section class="character-panel panel">
-          <div class="skin-selector-wrapper">
-            <label for="skinSelector">Skin:</label>
-            <select id="skinSelector" class="skin-selector"></select>
-          </div>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-          <div class="character-display">
-            <img id="skinImage" class="character-image" src="" alt="Character" />
-            <p id="skinMeta" class="skin-meta">Stage 1/1</p>
-          </div>
-        </section>
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at top, #1f2937 0%, var(--bg) 45%, #020817 100%);
+  color: var(--text);
+  overflow-x: hidden;
+}
 
-        <section class="hero-card panel">
-          <div class="weight-block">
-            <p class="label">Current weight</p>
-            <h2 id="weightValue">180.0 lb</h2>
-            <p id="goalText" class="muted">Goal: 250 lb</p>
-          </div>
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+}
 
-          <div class="progress-wrap">
-            <div class="progress-bar" aria-label="Weight progress">
-              <div id="progressFill" class="progress-fill"></div>
-            </div>
-            <div class="progress-labels">
-              <span>0 lb</span>
-              <span id="goalLabel">250 lb</span>
-            </div>
-          </div>
-        </section>
+button, select {
+  font: inherit;
+  cursor: pointer;
+}
 
-        <section class="stats-grid">
-          <article class="stat-box panel">
-            <p class="label">Calories</p>
-            <strong id="caloriesValue">0</strong>
-          </article>
+.app-shell {
+  width: min(100%, 480px);
+  animation: slideIn 0.4s ease-out;
+}
 
-          <article class="stat-box panel">
-            <p class="label">Per tap</p>
-            <strong id="tapValue">10</strong>
-          </article>
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-          <article class="stat-box panel">
-            <p class="label">Auto gain</p>
-            <strong id="autoValue">0/s</strong>
-          </article>
-        </section>
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
 
-        <button id="eatButton" class="eat-button" type="button" aria-label="Eat to gain weight">
-          <span class="button-icon">🍔</span>
-          <span class="button-copy">Eat for gains</span>
-          <small>+<span id="tapGain">10</span> calories</small>
-        </button>
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        <section class="rebirth-panel panel">
-          <div class="rebirth-header">
-            <h3>Rebirth</h3>
-            <span id="rebirthCount" class="rebirth-badge">Rebirths: 0</span>
-          </div>
-          <p id="rebirthReward" class="rebirth-reward">Next reward: 0 points</p>
-          <button id="rebirthBtn" class="rebirth-button" type="button">Rebirth</button>
-        </section>
+.eyebrow,
+.label,
+.muted {
+  margin: 0;
+  color: var(--muted);
+}
 
-        <section class="shop panel">
-          <div class="shop-header">
-            <h3>Upgrades</h3>
-            <span id="statusText" class="status-pill">Ready</span>
-          </div>
-          <div id="shopList" class="shop-list" aria-live="polite"></div>
-        </section>
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
 
-        <section class="prestige-panel panel">
-          <div class="prestige-header">
-            <h3>Prestige Upgrades</h3>
-          </div>
-          <div id="rebirthUpgradeBtns" class="prestige-grid"></div>
-        </section>
-      </main>
-    </div>
+h1 {
+  font-size: clamp(1.75rem, 4vw, 2.3rem);
+  letter-spacing: -0.02em;
+}
 
-    <script src="script.js"></script>
-  </body>
-</html>
+h2 {
+  font-size: clamp(2rem, 8vw, 3rem);
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.panel {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 18px 34px var(--shadow);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.character-panel {
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.skin-selector-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.skin-selector-wrapper label {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.skin-selector {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: border-color 0.2s;
+}
+
+.skin-selector:hover,
+.skin-selector:focus {
+  border-color: var(--gold);
+  outline: none;
+}
+
+.character-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.character-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.6);
+  object-fit: contain;
+  animation: imageZoom 0.4s ease-out;
+}
+
+@keyframes imageZoom {
+  from {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.skin-meta {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gold-soft);
+  font-weight: 600;
+}
+
+.hero-card {
+  padding: 22px 18px 18px;
+  margin-bottom: 16px;
+}
+
+.weight-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-wrap {
+  margin-top: 18px;
+}
+
+.progress-bar {
+  position: relative;
+  height: 18px;
+  background: rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold-soft), var(--green));
+  transition: width 0.15s ease;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  padding: 14px 12px;
+  text-align: center;
+  border-radius: 16px;
+}
+
+.stat-box strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.1rem, 5vw, 1.4rem);
+  color: var(--gold-soft);
+}
+
+.eat-button {
+  width: 100%;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--gold) 0%, #f97316 100%);
+  color: #111827;
+  font-weight: 800;
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
+  padding: 24px 18px;
+  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 160px;
+  touch-action: manipulation;
+  transition: all 0.2s;
+}
+
+.eat-button:active {
+  transform: scale(0.96);
+  box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.eat-button:hover {
+  box-shadow: 0 16px 32px rgba(245, 158, 11, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.button-icon {
+  font-size: 2.8rem;
+  display: block;
+}
+
+.button-copy {
+  line-height: 1.1;
+  font-size: 1.1em;
+}
+
+.eat-button small {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.rebirth-panel {
+  margin-bottom: 16px;
+  padding: 18px 14px 14px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(168, 85, 247, 0.16));
+  border: 1.5px solid rgba(147, 197, 253, 0.35);
+  border-radius: 20px;
+}
+
+.rebirth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.rebirth-header h3 {
+  color: var(--blue-soft);
+  font-size: 1.1rem;
+}
+
+.rebirth-subtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.rebirth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(96, 165, 250, 0.22);
+  color: #dbeafe;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+}
+
+.prestige-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(168, 85, 247, 0.18);
+  color: #e9d5ff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.rebirth-reward {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.rebirth-reward strong {
+  color: var(--blue-soft);
+  font-weight: 700;
+}
+
+.rebirth-button {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 14px 12px;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
+  transition: all 0.2s;
+}
+
+.rebirth-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(59, 130, 246, 0.35);
+}
+
+.rebirth-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.25);
+}
+
+.rebirth-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shop {
+  margin-bottom: 16px;
+  padding: 18px 12px 12px;
+}
+
+.shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.shop-header h3 {
+  color: var(--gold-soft);
+}
+
+.status-pill {
+  background: rgba(52, 211, 153, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: var(--green-soft);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.shop-list,
+.prestige-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.upgrade-card,
+.rebirth-upgrade-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 14px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: var(--text);
+  padding: 12px 10px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.upgrade-card:hover:not(:disabled),
+.rebirth-upgrade-card:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(148, 163, 184, 0.3);
+  transform: translateX(2px);
+}
+
+.upgrade-card:disabled,
+.rebirth-upgrade-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upgrade-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(245, 158, 11, 0.12);
+  font-size: 1.45rem;
+  flex-shrink: 0;
+}
+
+.upgrade-main {
+  min-width: 0;
+}
+
+.upgrade-name {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.upgrade-name small {
+  font-weight: 500;
+  color: var(--gold-soft);
+  margin-left: 4px;
+}
+
+.upgrade-desc {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+.upgrade-cost {
+  font-weight: 800;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--gold-soft);
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.prestige-panel {
+  margin-bottom: 16px;
+  padding: 18px 12px 12px;
+}
+
+.prestige-header {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.prestige-header h3 {
+  color: var(--purple);
+  margin-bottom: 4px;
+}
+
+.prestige-info {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.secondary-button {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.secondary-button:hover {
+  border-color: var(--muted);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.secondary-button:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 380px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .upgrade-card,
+  .rebirth-upgrade-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .upgrade-cost {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 4px;
+  }
+
+  .topbar-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .eat-button {
+    min-height: 140px;
+    padding: 16px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

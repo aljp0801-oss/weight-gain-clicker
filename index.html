@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f59e0b" />
-    <meta
-      name="description"
-      content="Weight gain clicker game built for phones in HTML5."
-    />
+    <meta name="description" content="Weight gain clicker game built for phones in HTML5." />
     <title>Bulk Builder</title>
     <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23f59e0b' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
@@ -21,10 +18,25 @@
           <p class="eyebrow">Gain mode</p>
           <h1>Bulk Builder</h1>
         </div>
-        <button id="resetBtn" class="secondary-button" type="button">Reset</button>
+        <div class="topbar-actions">
+          <span id="prestigeDisplay" class="prestige-badge">✨ 0</span>
+          <button id="resetBtn" class="secondary-button" type="button">Reset</button>
+        </div>
       </header>
 
       <main class="game-layout">
+        <section class="character-panel panel">
+          <div class="skin-selector-wrapper">
+            <label for="skinSelector">Choose Your Character:</label>
+            <select id="skinSelector" class="skin-selector"></select>
+          </div>
+
+          <div class="character-display">
+            <img id="skinImage" class="character-image" src="" alt="Character" />
+            <p id="skinMeta" class="skin-meta">Loading...</p>
+          </div>
+        </section>
+
         <section class="hero-card panel">
           <div class="weight-block">
             <p class="label">Current weight</p>
@@ -63,15 +75,35 @@
         <button id="eatButton" class="eat-button" type="button" aria-label="Eat to gain weight">
           <span class="button-icon">🍔</span>
           <span class="button-copy">Eat for gains</span>
-          <small>+<span id="tapGain">10</span> calories</small>
+          <small>+<span id="tapGain">10</span> cal</small>
         </button>
+
+        <section class="rebirth-panel panel">
+          <div class="rebirth-header">
+            <div>
+              <h3>🚀 Rebirth</h3>
+              <p class="rebirth-subtitle">Reset to gain power</p>
+            </div>
+            <span id="rebirthCount" class="rebirth-badge">×<span id="rebirthCountNum">0</span></span>
+          </div>
+          <p id="rebirthReward" class="rebirth-reward">Next reward: <strong>0 points</strong></p>
+          <button id="rebirthBtn" class="rebirth-button" type="button">Rebirth & Ascend</button>
+        </section>
 
         <section class="shop panel">
           <div class="shop-header">
-            <h3>Upgrades</h3>
+            <h3>⚡ Upgrades</h3>
             <span id="statusText" class="status-pill">Ready</span>
           </div>
           <div id="shopList" class="shop-list" aria-live="polite"></div>
+        </section>
+
+        <section class="prestige-panel panel">
+          <div class="prestige-header">
+            <h3>💎 Prestige Upgrades</h3>
+            <p class="prestige-info">Use points from rebirths</p>
+          </div>
+          <div id="rebirthUpgradeBtns" class="prestige-grid"></div>
         </section>
       </main>
     </div>
