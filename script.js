@@ -1,25 +1,46 @@
 const STORAGE_KEY = "bulk-builder-save-v1";
 
 const SKINS = [
-  { id: "beach", label: "Beach", folder: "Beach Skin", stageCount: 9, maxWeight: 420 },
-  { id: "camila", label: "Camila", folder: "Camila skin", stageCount: 3, maxWeight: 260 },
-  { id: "camila-alt", label: "Camila Alt", folder: "Camila skin/Alt Skin skin", stageCount: 5, maxWeight: 320 },
-  { id: "catgirl", label: "Cat Girl", folder: "Cat girl skin", stageCount: 3, maxWeight: 275 },
-  { id: "christmas", label: "Christmas", folder: "Chrismas skin", stageCount: 13, maxWeight: 500 },
-  { id: "eating", label: "Eating", folder: "Eating Skin", stageCount: 10, maxWeight: 460 },
-  { id: "endurance", label: "Endurance", folder: "Endurance skin", stageCount: 6, maxWeight: 330 },
-  { id: "extreme", label: "Extreme Weight Gain", folder: "Extreme Weight Gain", stageCount: 12, maxWeight: 800 },
-  { id: "few-pounds", label: "Few Pounds", folder: "Few pounds skin", stageCount: 5, maxWeight: 220 },
-  { id: "gym", label: "Gym", folder: "Gym skin", stageCount: 10, maxWeight: 450 },
-  { id: "kitagawa", label: "Kitagawa", folder: "Kitagawa skin", stageCount: 9, maxWeight: 350 },
-  { id: "komi", label: "Komi", folder: "Komi skin", stageCount: 3, maxWeight: 220 },
-  { id: "main", label: "Main", folder: "Main Skin", stageCount: 20, maxWeight: 700 },
-  { id: "mercy", label: "Mercy", folder: "Mercy skin", stageCount: 3, maxWeight: 240 },
-  { id: "ramen", label: "Ramen", folder: "Ramen skin", stageCount: 3, maxWeight: 260 },
-  { id: "resort-a", label: "Resort A", folder: "Resort A skin", stageCount: 22, maxWeight: 760 },
-  { id: "resort-c", label: "Resort C", folder: "Resort C skin", stageCount: 23, maxWeight: 780 },
-  { id: "runner", label: "Runner Blobfication", folder: "Runner Blobfication skin", stageCount: 13, maxWeight: 540 },
+  { id: "beach", label: "Beach", folder: "Beach Skin", maxWeight: 800 },
+  { id: "camila", label: "Camila", folder: "Camila skin", maxWeight: 1100 },
+  { id: "camila-alt", label: "Camila Alt", folder: "Camila skin/Alt Skin skin", maxWeight: 1000 },
+  { id: "catgirl", label: "Cat Girl", folder: "Cat girl skin", maxWeight: 650 },
+  { id: "christmas", label: "Christmas", folder: "Chrismas skin", maxWeight: 325 },
+  { id: "eating", label: "Eating", folder: "Eating Skin", maxWeight: 625 },
+  { id: "endurance", label: "Endurance", folder: "Endurance skin", maxWeight: 1500 },
+  { id: "extreme", label: "Extreme Weight Gain", folder: "Extreme Weight Gain", maxWeight: 2250 },
+  { id: "few-pounds", label: "Few Pounds", folder: "Few pounds skin", maxWeight: 1750 },
+  { id: "gym", label: "Gym", folder: "Gym skin", maxWeight: 625 },
+  { id: "kitagawa", label: "Kitagawa", folder: "Kitagawa skin", maxWeight: 1700 },
+  { id: "komi", label: "Komi", folder: "Komi skin", maxWeight: 450 },
+  { id: "main", label: "Main", folder: "Main Skin", maxWeight: 4000 },
+  { id: "mercy", label: "Mercy", folder: "Mercy skin", maxWeight: 550 },
+  { id: "ramen", label: "Ramen", folder: "Ramen skin", maxWeight: 650 },
+  { id: "resort-a", label: "Resort A", folder: "Resort A skin", maxWeight: 5000 },
+  { id: "resort-c", label: "Resort C", folder: "Resort C skin", maxWeight: 7000 },
+  { id: "runner", label: "Runner Blobfication", folder: "Runner Blobfication skin", maxWeight: 15000 },
 ];
+
+const STAGE_COUNTS = {
+  "Beach Skin": 9,
+  "Camila skin": 3,
+  "Camila skin/Alt Skin skin": 5,
+  "Cat girl skin": 3,
+  "Chrismas skin": 13,
+  "Eating Skin": 10,
+  "Endurance skin": 6,
+  "Extreme Weight Gain": 12,
+  "Few pounds skin": 5,
+  "Gym skin": 10,
+  "Kitagawa skin": 9,
+  "Komi skin": 3,
+  "Main Skin": 20,
+  "Mercy skin": 3,
+  "Ramen skin": 3,
+  "Resort A skin": 22,
+  "Resort C skin": 23,
+  "Runner Blobfication skin": 13,
+};
 
 const upgradeCatalog = [
   {
@@ -174,30 +195,40 @@ function updateAutoGain() {
   state.autoGain = totalAuto;
 }
 
+function getStageCountForSkin(skinFolder) {
+  return STAGE_COUNTS[skinFolder] || 1;
+}
+
 function getCurrentStageIndex() {
   const skin = selectedSkin();
   if (!skin) return 0;
 
-  const stageRange = Math.max(1, skin.stageCount);
-  const stagePercent = Math.min(Math.max(state.weight / skin.maxWeight, 0), 1);
-  const raw = stagePercent * (stageRange - 1);
-  return Math.min(Math.max(Math.floor(raw), 0), stageRange - 1);
+  const stageCount = getStageCountForSkin(skin.folder);
+  if (stageCount <= 1) return 0;
+
+  const maxWeight = skin.maxWeight;
+  const currentWeight = Math.max(state.weight, 0);
+  const normalizedProgress = Math.min(Math.max(currentWeight / maxWeight, 0), 1);
+
+  // Difficulty scaling: exponential curve makes progression harder as you advance
+  const scaledProgress = Math.pow(normalizedProgress, 0.4);
+  const stageIndex = Math.floor(scaledProgress * (stageCount - 1));
+
+  return Math.min(Math.max(stageIndex, 0), stageCount - 1);
 }
 
 function updateSkinImage() {
   const skin = selectedSkin();
-  const stage = getCurrentStageIndex() + 1;
-  const imagePath = `images/${skin.folder}/${stage}.webp`;
+  const stageIndex = getCurrentStageIndex();
+  const stage = stageIndex + 1;
+  const stageCount = getStageCountForSkin(skin.folder);
+
+  const imagePath = `${skin.folder}/${stage}.webp`;
   els.skinImage.src = imagePath;
   els.skinImage.alt = `${skin.label} stage ${stage}`;
 
-  const skinMax = skin.maxWeight || state.goalWeight;
-  const stageText = `Stage ${stage}/${skin.stageCount} • Max ${skinMax} lb`;
+  const stageText = `Stage ${stage}/${stageCount} • Max ${Math.floor(skin.maxWeight)} lb`;
   els.skinMeta.textContent = stageText;
-
-  const currentWeight = Math.min(state.weight, skinMax);
-  state.weight = currentWeight;
-  state.goalWeight = skinMax;
 }
 
 function applySelectedSkin() {
@@ -215,7 +246,6 @@ function onEat() {
   const gain = state.perClick;
   state.calories += gain;
   state.weight = Math.min(state.weight + gain * 0.08, selectedSkin().maxWeight);
-  updateSkinImage();
   render();
   saveState();
 }
