@@ -43,68 +43,20 @@ const STAGE_COUNTS = {
 };
 
 const REBIRTH_UPGRADES = [
-  { id: "rb-click", label: "Tap Power", icon: "🔆", cost: 1, effect: (level) => level * 2, description: "+2 per tap per level" },
-  { id: "rb-auto", label: "Auto Gain", icon: "⚙️", cost: 1, effect: (level) => level * 1, description: "+1/s per level" },
-  { id: "rb-calorie", label: "Calorie Boost", icon: "🔐", cost: 2, effect: (level) => level * 0.05, description: "+5% calories per level" },
-  { id: "rb-weight", label: "Weight Gain", icon: "👕", cost: 3, effect: (level) => level * 0.08, description: "+8% weight gain per level" },
-  { id: "rb-prestige", label: "Prestige Bonus", icon: "✨", cost: 5, effect: (level) => level * 0.1, description: "+10% all gains per level" },
+  { id: "rb-click", label: "Tap Power", icon: "🔆", cost: 1, description: "+2 per tap per level" },
+  { id: "rb-auto", label: "Auto Gain", icon: "⚙️", cost: 1, description: "+1/s per level" },
+  { id: "rb-calorie", label: "Calorie Boost", icon: "🔐", cost: 2, description: "+5% calories per level" },
+  { id: "rb-weight", label: "Weight Gain", icon: "👕", cost: 3, description: "+8% weight gain per level" },
+  { id: "rb-prestige", label: "Prestige Bonus", icon: "✨", cost: 5, description: "+10% all gains per level" },
 ];
 
 const upgradeCatalog = [
-  {
-    id: "protein",
-    icon: "🥤",
-    name: "Protein Shake",
-    description: "+6 per tap",
-    baseCost: 50,
-    type: "click",
-    value: 6,
-  },
-  {
-    id: "snacks",
-    icon: "🍟",
-    name: "Snack Pack",
-    description: "+18 per tap",
-    baseCost: 220,
-    type: "click",
-    value: 18,
-  },
-  {
-    id: "buffet",
-    icon: "🍔",
-    name: "Buffet Pass",
-    description: "+60 per tap",
-    baseCost: 900,
-    type: "click",
-    value: 60,
-  },
-  {
-    id: "rest",
-    icon: "😴",
-    name: "Recovery Mode",
-    description: "+4 calories/s",
-    baseCost: 1200,
-    type: "auto",
-    value: 4,
-  },
-  {
-    id: "coach",
-    icon: "🏋️",
-    name: "Gains Coach",
-    description: "+12 calories/s",
-    baseCost: 4200,
-    type: "auto",
-    value: 12,
-  },
-  {
-    id: "bulk",
-    icon: "💪",
-    name: "Bulk Cycle",
-    description: "+45 calories/s",
-    baseCost: 15000,
-    type: "auto",
-    value: 45,
-  },
+  { id: "protein", icon: "🥤", name: "Protein Shake", description: "+6 per tap", baseCost: 50, type: "click", value: 6 },
+  { id: "snacks", icon: "🍟", name: "Snack Pack", description: "+18 per tap", baseCost: 220, type: "click", value: 18 },
+  { id: "buffet", icon: "🍔", name: "Buffet Pass", description: "+60 per tap", baseCost: 900, type: "click", value: 60 },
+  { id: "rest", icon: "😴", name: "Recovery Mode", description: "+4 calories/s", baseCost: 1200, type: "auto", value: 4 },
+  { id: "coach", icon: "🏋️", name: "Gains Coach", description: "+12 calories/s", baseCost: 4200, type: "auto", value: 12 },
+  { id: "bulk", icon: "💪", name: "Bulk Cycle", description: "+45 calories/s", baseCost: 15000, type: "auto", value: 45 },
 ];
 
 const defaultState = {
@@ -114,22 +66,9 @@ const defaultState = {
   autoGain: 0,
   selectedSkinId: "main",
   goalWeight: 250,
-  upgrades: {
-    protein: 0,
-    snacks: 0,
-    buffet: 0,
-    rest: 0,
-    coach: 0,
-    bulk: 0,
-  },
+  upgrades: { protein: 0, snacks: 0, buffet: 0, rest: 0, coach: 0, bulk: 0 },
   rebirths: 0,
-  rebirthUpgrades: {
-    "rb-click": 0,
-    "rb-auto": 0,
-    "rb-calorie": 0,
-    "rb-weight": 0,
-    "rb-prestige": 0,
-  },
+  rebirthUpgrades: { "rb-click": 0, "rb-auto": 0, "rb-calorie": 0, "rb-weight": 0, "rb-prestige": 0 },
   totalCaloriesEarned: 0,
 };
 
@@ -150,9 +89,9 @@ const els = {
   shopList: document.getElementById("shopList"),
   resetBtn: document.getElementById("resetBtn"),
   rebirthBtn: document.getElementById("rebirthBtn"),
-  rebirthUpgradeBtns: document.getElementById("rebirthUpgradeBtns"),
   rebirthCount: document.getElementById("rebirthCount"),
   rebirthReward: document.getElementById("rebirthReward"),
+  rebirthUpgradeBtns: document.getElementById("rebirthUpgradeBtns"),
   skinSelector: document.getElementById("skinSelector"),
   skinImage: document.getElementById("skinImage"),
   skinMeta: document.getElementById("skinMeta"),
@@ -162,19 +101,12 @@ function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return structuredClone(defaultState);
-
     const parsed = JSON.parse(raw);
     return {
       ...structuredClone(defaultState),
       ...parsed,
-      upgrades: {
-        ...defaultState.upgrades,
-        ...(parsed.upgrades || {}),
-      },
-      rebirthUpgrades: {
-        ...defaultState.rebirthUpgrades,
-        ...(parsed.rebirthUpgrades || {}),
-      },
+      upgrades: { ...defaultState.upgrades, ...(parsed.upgrades || {}) },
+      rebirthUpgrades: { ...defaultState.rebirthUpgrades, ...(parsed.rebirthUpgrades || {}) },
     };
   } catch (error) {
     return structuredClone(defaultState);
@@ -210,11 +142,9 @@ function getUpgradeValue(item) {
 
 function calculateRebirthReward() {
   const skin = selectedSkin();
-  const weight = Math.min(state.weight, skin.maxWeight);
-  const baseReward = Math.floor(weight / 100);
+  const progress = Math.min(Math.max(state.weight / skin.maxWeight, 0), 1);
   const prestigeBonus = state.rebirthUpgrades["rb-prestige"] || 0;
-  const multiplier = 1 + prestigeBonus * 0.1;
-  return Math.floor(baseReward * multiplier);
+  return Math.floor((progress * 150 + state.rebirths * 25) * (1 + prestigeBonus * 0.1));
 }
 
 function canRebirth() {
@@ -230,6 +160,7 @@ function performRebirth() {
 
   const reward = calculateRebirthReward();
   state.rebirths += 1;
+  state.totalCaloriesEarned += reward;
 
   const clickBonus = (state.rebirthUpgrades["rb-click"] || 0) * 2;
   const autoBonus = (state.rebirthUpgrades["rb-auto"] || 0) * 1;
@@ -238,8 +169,7 @@ function performRebirth() {
   state.perClick = 10 + clickBonus;
   state.autoGain = autoBonus;
   state.weight = 180;
-  state.calories = Math.floor(state.calories * (1 + calorieBonus));
-  state.totalCaloriesEarned += reward;
+  state.calories = Math.max(0, Math.floor(state.calories * (1 + calorieBonus)));
 
   Object.keys(state.upgrades).forEach((key) => {
     state.upgrades[key] = 0;
@@ -269,13 +199,9 @@ function buyRebirthUpgrade(id) {
 
 function updateAutoGain() {
   let totalAuto = 0;
-
   upgradeCatalog.forEach((item) => {
-    if (item.type === "auto") {
-      totalAuto += getUpgradeValue(item);
-    }
+    if (item.type === "auto") totalAuto += getUpgradeValue(item);
   });
-
   totalAuto += state.rebirthUpgrades["rb-auto"] || 0;
   state.autoGain = totalAuto;
 }
@@ -286,8 +212,8 @@ function getStageCountForSkin(skinFolder) {
 
 function getDifficultyCurve() {
   const skin = selectedSkin();
-  const baseCurve = { easy: 0.25, medium: 0.35, hard: 0.45 }[skin.difficulty] || 0.35;
-  return baseCurve + Math.min(skin.maxWeight / 20000, 0.25);
+  const curveMap = { easy: 0.25, medium: 0.35, hard: 0.45 };
+  return (curveMap[skin.difficulty] || 0.35) + Math.min(skin.maxWeight / 20000, 0.25);
 }
 
 function getCurrentStageIndex() {
@@ -297,12 +223,9 @@ function getCurrentStageIndex() {
   const stageCount = getStageCountForSkin(skin.folder);
   if (stageCount <= 1) return 0;
 
-  const maxWeight = skin.maxWeight;
   const currentWeight = Math.max(state.weight, 0);
-  const normalizedProgress = Math.min(Math.max(currentWeight / maxWeight, 0), 1);
-
-  const difficultyCurve = getDifficultyCurve();
-  const scaledProgress = Math.pow(normalizedProgress, difficultyCurve);
+  const normalizedProgress = Math.min(Math.max(currentWeight / skin.maxWeight, 0), 1);
+  const scaledProgress = Math.pow(normalizedProgress, getDifficultyCurve());
   const stageIndex = Math.floor(scaledProgress * (stageCount - 1));
 
   return Math.min(Math.max(stageIndex, 0), stageCount - 1);
@@ -314,24 +237,18 @@ function updateSkinImage() {
   const stage = stageIndex + 1;
   const stageCount = getStageCountForSkin(skin.folder);
 
-  const imageFolder = skin.folder
-    .split("/")
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-
+  const imageFolder = skin.folder.split("/").map((part) => encodeURIComponent(part)).join("/");
   const imagePath = `${imageFolder}/${stage}.webp`;
+
   els.skinImage.src = imagePath;
   els.skinImage.alt = `${skin.label} stage ${stage}`;
-
-  const stageText = `Stage ${stage}/${stageCount} • Max ${Math.floor(skin.maxWeight)} lb`;
-  els.skinMeta.textContent = stageText;
+  els.skinMeta.textContent = `Stage ${stage}/${stageCount} • Max ${Math.floor(skin.maxWeight)} lb`;
 }
 
 function applySelectedSkin() {
   const skin = selectedSkin();
   state.selectedSkinId = skin.id;
-  const clampedWeight = Math.min(Math.max(state.weight, 90), skin.maxWeight);
-  state.weight = clampedWeight;
+  state.weight = Math.min(Math.max(state.weight, 90), skin.maxWeight);
   state.goalWeight = skin.maxWeight;
   updateSkinImage();
   render();
@@ -352,7 +269,6 @@ function buyUpgrade(id) {
   if (!item) return;
 
   const cost = calculateUpgradeCost(item);
-
   if (state.calories < cost) {
     els.statusText.textContent = "Need more calories";
     return;
@@ -361,9 +277,7 @@ function buyUpgrade(id) {
   state.calories -= cost;
   state.upgrades[id] = (state.upgrades[id] || 0) + 1;
 
-  if (item.type === "click") {
-    state.perClick += item.value;
-  }
+  if (item.type === "click") state.perClick += item.value;
 
   updateAutoGain();
   render();
@@ -372,7 +286,6 @@ function buyUpgrade(id) {
 
 function renderShop() {
   els.shopList.innerHTML = "";
-
   upgradeCatalog.forEach((item) => {
     const level = state.upgrades[item.id] || 0;
     const cost = calculateUpgradeCost(item);
@@ -395,7 +308,6 @@ function renderShop() {
 
 function renderRebirthUpgrades() {
   els.rebirthUpgradeBtns.innerHTML = "";
-
   REBIRTH_UPGRADES.forEach((upgrade) => {
     const level = state.rebirthUpgrades[upgrade.id] || 0;
     const card = document.createElement("button");
@@ -423,8 +335,8 @@ function render() {
   state.goalWeight = skin.maxWeight;
 
   const progress = Math.min((weight / skin.maxWeight) * 100, 100);
-  const rebirthReward = calculateRebirthReward();
-  const canDoRebirth = canRebirth();
+  const reward = calculateRebirthReward();
+  const canDoRebirthNow = canRebirth();
 
   els.caloriesValue.textContent = formatNumber(state.calories);
   els.tapValue.textContent = formatNumber(state.perClick);
@@ -435,9 +347,9 @@ function render() {
   els.progressFill.style.width = `${progress}%`;
   els.goalLabel.textContent = formatWeight(skin.maxWeight);
   els.rebirthCount.textContent = `Rebirths: ${state.rebirths}`;
-  els.rebirthReward.textContent = `Next reward: ${rebirthReward} points (${Math.floor(progress)}%)`;
-  els.rebirthBtn.disabled = !canDoRebirth;
-  els.rebirthBtn.textContent = canDoRebirth ? `Rebirth & Gain ${rebirthReward} Points` : `Need ${Math.floor(skin.maxWeight * 0.5)} lbs to Rebirth`;
+  els.rebirthReward.textContent = `Next reward: ${reward} points`; 
+  els.rebirthBtn.disabled = !canDoRebirthNow;
+  els.rebirthBtn.textContent = canDoRebirthNow ? `Rebirth for ${reward} points` : `Need ${Math.floor(skin.maxWeight * 0.5)} lbs to Rebirth`;
 
   if (weight >= skin.maxWeight) {
     els.statusText.textContent = "Maxed out! Ready to rebirth!";
@@ -464,17 +376,11 @@ function passiveTick() {
 }
 
 function resetGame() {
-  const confirmReset = window.confirm("Reset your gain progress? (Keep rebirths and prestige)");
+  const confirmReset = window.confirm("Reset your gain progress?");
   if (!confirmReset) return;
 
-  state.weight = 180;
-  state.calories = 0;
-  state.perClick = 10 + (state.rebirthUpgrades["rb-click"] || 0) * 2;
-  state.autoGain = (state.rebirthUpgrades["rb-auto"] || 0);
-  Object.keys(state.upgrades).forEach((key) => {
-    state.upgrades[key] = 0;
-  });
-
+  Object.assign(state, structuredClone(defaultState));
+  state.selectedSkinId = selectedSkin().id;
   saveState();
   render();
 }
@@ -503,3 +409,446 @@ els.skinSelector.addEventListener("change", (event) => {
 initSkinSelector();
 render();
 setInterval(passiveTick, 250);
+
+// Simple helper so the rebirth UI stays visible even if no prestige upgrades are purchased yet.
+if (!els.rebirthUpgradeBtns) {
+  console.warn("rebirthUpgradeBtns is missing from the DOM");
+}
+
+if (!els.rebirthBtn) {
+  console.warn("rebirthBtn is missing from the DOM");
+}
+
+if (!els.rebirthCount) {
+  console.warn("rebirthCount is missing from the DOM");
+}
+
+if (!els.rebirthReward) {
+  console.warn("rebirthReward is missing from the DOM");
+}
+
+if (!els.skinImage) {
+  console.warn("skinImage is missing from the DOM");
+}
+
+if (!els.skinSelector) {
+  console.warn("skinSelector is missing from the DOM");
+}
+
+if (!els.shopList) {
+  console.warn("shopList is missing from the DOM");
+}
+
+if (!els.statusText) {
+  console.warn("statusText is missing from the DOM");
+}
+
+if (!els.goalText) {
+  console.warn("goalText is missing from the DOM");
+}
+
+if (!els.weightValue) {
+  console.warn("weightValue is missing from the DOM");
+}
+
+if (!els.caloriesValue) {
+  console.warn("caloriesValue is missing from the DOM");
+}
+
+if (!els.tapValue) {
+  console.warn("tapValue is missing from the DOM");
+}
+
+if (!els.autoValue) {
+  console.warn("autoValue is missing from the DOM");
+}
+
+if (!els.eatButton) {
+  console.warn("eatButton is missing from the DOM");
+}
+
+if (!els.resetBtn) {
+  console.warn("resetBtn is missing from the DOM");
+}
+
+if (!els.goalLabel) {
+  console.warn("goalLabel is missing from the DOM");
+}
+
+if (!els.progressFill) {
+  console.warn("progressFill is missing from the DOM");
+}
+
+if (!els.skinMeta) {
+  console.warn("skinMeta is missing from the DOM");
+}
+
+if (!els.goalText) {
+  console.warn("goalText is missing from the DOM");
+}
+
+if (!els.tapGain) {
+  console.warn("tapGain is missing from the DOM");
+}
+
+if (!els.rebirthBtn) {
+  console.warn("rebirthBtn is missing from the DOM");
+}
+
+if (!els.rebirthReward) {
+  console.warn("rebirthReward is missing from the DOM");
+}
+
+if (!els.rebirthCount) {
+  console.warn("rebirthCount is missing from the DOM");
+}
+
+if (!els.rebirthUpgradeBtns) {
+  console.warn("rebirthUpgradeBtns is missing from the DOM");
+}
+
+// Keep the game mobile-friendly and easy to read on smaller screens.
+window.addEventListener("orientationchange", () => {
+  render();
+});
+
+window.addEventListener("resize", () => {
+  render();
+});
+
+render();
+setInterval(passiveTick, 250);
+
+console.log("Bulk Builder loaded with rebirth, prestige, and skin progression.");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"}]}  
