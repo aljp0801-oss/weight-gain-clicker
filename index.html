@@ -7,8 +7,6 @@
     <meta name="description" content="Weight gain clicker game built for phones in HTML5." />
     <title>Bulk Builder</title>
     <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23f59e0b' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' width='100' height='100'/><text x='50%' y='50%' font-size='60' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>💪</text></svg>" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -25,18 +23,6 @@
       </header>
 
       <main class="game-layout">
-        <section class="character-panel panel">
-          <div class="skin-selector-wrapper">
-            <label for="skinSelector">Choose Your Character:</label>
-            <select id="skinSelector" class="skin-selector"></select>
-          </div>
-
-          <div class="character-display">
-            <img id="skinImage" class="character-image" src="" alt="Character" />
-            <p id="skinMeta" class="skin-meta">Loading...</p>
-          </div>
-        </section>
-
         <section class="hero-card panel">
           <div class="weight-block">
             <p class="label">Current weight</p>
@@ -84,7 +70,7 @@
               <h3>🚀 Rebirth</h3>
               <p class="rebirth-subtitle">Reset to gain power</p>
             </div>
-            <span id="rebirthCount" class="rebirth-badge">×<span id="rebirthCountNum">0</span></span>
+            <span class="rebirth-badge">×<span id="rebirthCountNum">0</span></span>
           </div>
           <p id="rebirthReward" class="rebirth-reward">Next reward: <strong>0 points</strong></p>
           <button id="rebirthBtn" class="rebirth-button" type="button">Rebirth & Ascend</button>
